@@ -15,6 +15,7 @@
     <string name="ipv6_enabled">Включить IPv6 для VPN-интерфейса</string>
     <string name="new_profile">Новый профиль</string>
     <string name="configuration">Конфигурация</string>
+    <string name="routes">Маршруты</string>
     <string name="bypass_lan_title">Обход локальной сети</string>
     <string name="bypass_lan_summary">Если включено, трафик локальной сети не будет проходить через прокси.</string>
     <string name="use_template_title">Создавать новую конфигурацию из шаблона</string>
@@ -52,6 +53,7 @@
     <string name="restore_failed">Ошибка восстановления</string>
     <string name="restore_success">Восстановление прошло успешно</string>
     <string name="no_config_files">Файлы конфигурации отсутствуют</string>
+    <string name="no_routes">Нет созданных маршрутов</string>
     <string name="no_log_entries">Нет записей в журнале</string>
     <string name="rule_file_default">Файл правил по умолчанию</string>
     <string name="import_success">Импорт успешно выполнен</string>

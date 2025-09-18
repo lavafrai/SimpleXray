@@ -21,15 +21,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.simplexray.an.common.ROUTE_CONFIG
 import com.simplexray.an.common.ROUTE_LOG
+import com.simplexray.an.common.ROUTE_ROUTING
 import com.simplexray.an.common.ROUTE_SETTINGS
 import com.simplexray.an.common.ROUTE_STATS
 import com.simplexray.an.service.TProxyService
 import com.simplexray.an.ui.screens.ConfigScreen
 import com.simplexray.an.ui.screens.DashboardScreen
 import com.simplexray.an.ui.screens.LogScreen
+import com.simplexray.an.ui.screens.RoutingScreen
 import com.simplexray.an.ui.screens.SettingsScreen
 import com.simplexray.an.viewmodel.LogViewModel
 import com.simplexray.an.viewmodel.MainViewModel
+import com.simplexray.an.viewmodel.RoutesViewModel
 import java.io.File
 
 private const val TAG = "AppNavGraph"
@@ -100,9 +103,11 @@ fun BottomNavHost(
     paddingValues: PaddingValues,
     mainViewModel: MainViewModel,
     onDeleteConfigClick: (File, () -> Unit) -> Unit,
+    routesViewModel: RoutesViewModel,
     logViewModel: LogViewModel,
     geoipFilePickerLauncher: ActivityResultLauncher<Array<String>>,
     geositeFilePickerLauncher: ActivityResultLauncher<Array<String>>,
+    routingListState: LazyListState,
     logListState: LazyListState,
     configListState: LazyListState,
     settingsScrollState: ScrollState
@@ -135,6 +140,19 @@ fun BottomNavHost(
                 onDeleteConfigClick = onDeleteConfigClick,
                 mainViewModel = mainViewModel,
                 listState = configListState
+            )
+        }
+
+        composable(
+            route = ROUTE_ROUTING,
+            enterTransition = { enterTransition() },
+            exitTransition = { exitTransition() },
+            popEnterTransition = { popEnterTransition() },
+            popExitTransition = { popExitTransition() }
+        ) {
+            RoutingScreen(
+                routesViewModel = routesViewModel,
+                listState = routingListState,
             )
         }
 

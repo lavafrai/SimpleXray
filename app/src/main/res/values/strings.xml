@@ -20,6 +20,7 @@
     <string name="ipv6_enabled">Enable IPv6 for VPN Interface</string>
     <string name="new_profile">New Profile</string>
     <string name="configuration">Configuration</string>
+    <string name="routes">Routes</string>
     <string name="bypass_lan_title">Bypass LAN</string>
     <string name="bypass_lan_summary">When enabled, LAN traffic will not go through the proxy.</string>
     <string name="use_template_title">Create new config from template</string>
@@ -57,6 +58,7 @@
     <string name="restore_failed">Restore failed</string>
     <string name="restore_success">Restore successful</string>
     <string name="no_config_files">No configuration files</string>
+    <string name="no_routes">No routes</string>
     <string name="no_log_entries">No log entries</string>
     <string name="rule_file_default">Default rule file</string>
     <string name="import_success">import successful</string>

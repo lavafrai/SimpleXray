@@ -44,10 +44,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.simplexray.an.R
 import com.simplexray.an.common.ROUTE_CONFIG
 import com.simplexray.an.common.ROUTE_LOG
+import com.simplexray.an.common.ROUTE_ROUTING
 import com.simplexray.an.common.ROUTE_SETTINGS
 import com.simplexray.an.common.ROUTE_STATS
 import com.simplexray.an.viewmodel.LogViewModel
 import com.simplexray.an.viewmodel.MainViewModel
+import com.simplexray.an.viewmodel.RoutesViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -57,6 +59,7 @@ fun AppScaffold(
     snackbarHostState: SnackbarHostState,
     mainViewModel: MainViewModel,
     logViewModel: LogViewModel,
+    routesViewModel: RoutesViewModel,
     onCreateNewConfigFileAndEdit: () -> Unit,
     onImportConfigFromClipboard: () -> Unit,
     onPerformExport: () -> Unit,
@@ -95,6 +98,7 @@ fun AppScaffold(
                 mainViewModel.controlMenuClickable.collectAsState().value,
                 mainViewModel.isServiceEnabled.collectAsState().value,
                 logViewModel,
+                routesViewModel,
                 logListState = logListState,
                 configListState = configListState,
                 settingsScrollState = settingsScrollState,
@@ -128,6 +132,7 @@ fun AppTopAppBar(
     controlMenuClickable: Boolean,
     isServiceEnabled: Boolean,
     logViewModel: LogViewModel,
+    routesViewModel: RoutesViewModel,
     logListState: LazyListState,
     configListState: LazyListState,
     settingsScrollState: androidx.compose.foundation.ScrollState,
@@ -139,10 +144,11 @@ fun AppTopAppBar(
     mainViewModel: MainViewModel
 ) {
     val title = when (currentRoute) {
-        "stats" -> stringResource(R.string.core_stats_title)
-        "config" -> stringResource(R.string.configuration)
-        "log" -> stringResource(R.string.log)
-        "settings" -> stringResource(R.string.settings)
+        ROUTE_STATS -> stringResource(R.string.core_stats_title)
+        ROUTE_CONFIG -> stringResource(R.string.configuration)
+        ROUTE_ROUTING -> stringResource(R.string.routes)
+        ROUTE_LOG -> stringResource(R.string.log)
+        ROUTE_SETTINGS -> stringResource(R.string.settings)
         else -> stringResource(R.string.app_name)
     }
 
@@ -156,9 +162,9 @@ fun AppTopAppBar(
     ) {
         derivedStateOf {
             when (currentRoute) {
-                "log" -> logListState.firstVisibleItemIndex > 0 || logListState.firstVisibleItemScrollOffset > 0
-                "config" -> configListState.firstVisibleItemIndex > 0 || configListState.firstVisibleItemScrollOffset > 0
-                "settings" -> settingsScrollState.value > 0
+                ROUTE_LOG -> logListState.firstVisibleItemIndex > 0 || logListState.firstVisibleItemScrollOffset > 0
+                ROUTE_CONFIG -> configListState.firstVisibleItemIndex > 0 || configListState.firstVisibleItemScrollOffset > 0
+                ROUTE_SETTINGS -> settingsScrollState.value > 0
                 else -> false
             }
         }
@@ -178,7 +184,7 @@ fun AppTopAppBar(
 
     TopAppBar(
         title = {
-            if (currentRoute == "log" && isLogSearching) {
+            if (currentRoute == ROUTE_LOG && isLogSearching) {
                 TextField(
                     value = logSearchQuery,
                     onValueChange = onLogSearchQueryChange,
@@ -201,7 +207,7 @@ fun AppTopAppBar(
             }
         },
         navigationIcon = {
-            if (currentRoute == "log" && isLogSearching) {
+            if (currentRoute == ROUTE_LOG && isLogSearching) {
                 IconButton(onClick = {
                     onLogSearchingChange(false)
                     onLogSearchQueryChange("")
@@ -214,7 +220,7 @@ fun AppTopAppBar(
             }
         },
         actions = {
-            if (currentRoute == "log" && isLogSearching) {
+            if (currentRoute == ROUTE_LOG && isLogSearching) {
                 if (logSearchQuery.isNotEmpty()) {
                     IconButton(onClick = { onLogSearchQueryChange("") }) {
                         Icon(
@@ -234,6 +240,7 @@ fun AppTopAppBar(
                     onSwitchVpnService = onSwitchVpnService,
                     controlMenuClickable = controlMenuClickable,
                     isServiceEnabled = isServiceEnabled,
+                    routesViewModel = routesViewModel,
                     logViewModel = logViewModel,
                     onLogSearchingChange = onLogSearchingChange,
                     mainViewModel = mainViewModel
@@ -255,12 +262,13 @@ private fun TopAppBarActions(
     onSwitchVpnService: () -> Unit,
     controlMenuClickable: Boolean,
     isServiceEnabled: Boolean,
+    routesViewModel: RoutesViewModel,
     logViewModel: LogViewModel,
     onLogSearchingChange: (Boolean) -> Unit = {},
     mainViewModel: MainViewModel
 ) {
     when (currentRoute) {
-        "config" -> ConfigActions(
+        ROUTE_CONFIG -> ConfigActions(
             onCreateNewConfigFileAndEdit = onCreateNewConfigFileAndEdit,
             onImportConfigFromClipboard = onImportConfigFromClipboard,
             onSwitchVpnService = onSwitchVpnService,
@@ -269,20 +277,24 @@ private fun TopAppBarActions(
             mainViewModel = mainViewModel
         )
 
-        "stats" -> StatsActions(
+        ROUTE_STATS -> StatsActions(
             onSwitchVpnService = onSwitchVpnService,
             controlMenuClickable = controlMenuClickable,
             isServiceEnabled = isServiceEnabled,
             mainViewModel = mainViewModel
         )
 
-        "log" -> LogActions(
+        ROUTE_ROUTING -> RoutesActions(
+            routesViewModel = routesViewModel
+        )
+
+        ROUTE_LOG -> LogActions(
             onPerformExport = onPerformExport,
             logViewModel = logViewModel,
             onLogSearchingChange = onLogSearchingChange
         )
 
-        "settings" -> SettingsActions(
+        ROUTE_SETTINGS -> SettingsActions(
             onPerformBackup = onPerformBackup,
             onPerformRestore = onPerformRestore
         )
@@ -348,6 +360,23 @@ private fun ConfigActions(
                 expanded = false
             },
             enabled = isServiceEnabled
+        )
+    }
+}
+
+@Composable
+private fun RoutesActions(
+    routesViewModel: RoutesViewModel
+) {
+    IconButton(
+        onClick = {  },
+        enabled = true
+    ) {
+        Icon(
+            painter = painterResource(
+                id = R.drawable.plus
+            ),
+            contentDescription = null
         )
     }
 }
@@ -495,6 +524,18 @@ fun AppBottomNavigationBar(navController: NavHostController) {
                 )
             },
             label = { Text(stringResource(R.string.configuration)) }
+        )
+        NavigationBarItem(
+            alwaysShowLabel = false,
+            selected = currentRoute == ROUTE_ROUTING,
+            onClick = { navigateToRoute(navController, ROUTE_ROUTING) },
+            icon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.routing),
+                    contentDescription = stringResource(R.string.routes)
+                )
+            },
+            label = { Text(stringResource(R.string.routes)) }
         )
         NavigationBarItem(
             alwaysShowLabel = false,

@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import com.simplexray.an.common.NAVIGATION_DEBOUNCE_DELAY
 import com.simplexray.an.common.ROUTE_CONFIG
 import com.simplexray.an.common.ROUTE_LOG
+import com.simplexray.an.common.ROUTE_ROUTING
 import com.simplexray.an.common.ROUTE_SETTINGS
 import com.simplexray.an.common.ROUTE_STATS
 import com.simplexray.an.common.rememberMainScreenCallbacks
@@ -29,6 +30,8 @@ import com.simplexray.an.viewmodel.LogViewModel
 import com.simplexray.an.viewmodel.LogViewModelFactory
 import com.simplexray.an.viewmodel.MainViewModel
 import com.simplexray.an.viewmodel.MainViewUiEvent
+import com.simplexray.an.viewmodel.RoutesViewModel
+import com.simplexray.an.viewmodel.RoutesViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -46,6 +49,9 @@ fun MainScreen(
 
     val logViewModel: LogViewModel = viewModel(
         factory = LogViewModelFactory(mainViewModel.application)
+    )
+    val routesViewModel: RoutesViewModel = viewModel(
+        factory = RoutesViewModelFactory(mainViewModel.application)
     )
 
     val callbacks = rememberMainScreenCallbacks(
@@ -105,6 +111,7 @@ fun MainScreen(
         }
     }
 
+    val routingListState = rememberLazyListState()
     val logListState = rememberLazyListState()
     val configListState = rememberLazyListState()
     val settingsScrollState = rememberScrollState()
@@ -112,13 +119,14 @@ fun MainScreen(
     val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val mainScreenRoutes = listOf(ROUTE_STATS, ROUTE_CONFIG, ROUTE_LOG, ROUTE_SETTINGS)
+    val mainScreenRoutes = listOf(ROUTE_STATS, ROUTE_CONFIG, ROUTE_ROUTING, ROUTE_LOG, ROUTE_SETTINGS)
 
     if (currentRoute in mainScreenRoutes) {
         AppScaffold(
             navController = bottomNavController,
             snackbarHostState = snackbarHostState,
             mainViewModel = mainViewModel,
+            routesViewModel = routesViewModel,
             logViewModel = logViewModel,
             onCreateNewConfigFileAndEdit = callbacks.onCreateNewConfigFileAndEdit,
             onImportConfigFromClipboard = callbacks.onImportConfigFromClipboard,
@@ -135,9 +143,11 @@ fun MainScreen(
                 paddingValues = paddingValues,
                 mainViewModel = mainViewModel,
                 onDeleteConfigClick = callbacks.onDeleteConfigClick,
+                routesViewModel = routesViewModel,
                 logViewModel = logViewModel,
                 geoipFilePickerLauncher = launchers.geoipFilePickerLauncher,
                 geositeFilePickerLauncher = launchers.geositeFilePickerLauncher,
+                routingListState = routingListState,
                 logListState = logListState,
                 configListState = configListState,
                 settingsScrollState = settingsScrollState
@@ -149,9 +159,11 @@ fun MainScreen(
             paddingValues = androidx.compose.foundation.layout.PaddingValues(),
             mainViewModel = mainViewModel,
             onDeleteConfigClick = callbacks.onDeleteConfigClick,
+            routesViewModel = routesViewModel,
             logViewModel = logViewModel,
             geoipFilePickerLauncher = launchers.geoipFilePickerLauncher,
             geositeFilePickerLauncher = launchers.geositeFilePickerLauncher,
+            routingListState = routingListState,
             logListState = logListState,
             configListState = configListState,
             settingsScrollState = settingsScrollState
