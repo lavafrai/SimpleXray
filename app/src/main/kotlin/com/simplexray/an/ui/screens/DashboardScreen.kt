@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
@@ -29,14 +30,18 @@ import com.simplexray.an.R
 import com.simplexray.an.common.formatBytes
 import com.simplexray.an.common.formatNumber
 import com.simplexray.an.common.formatUptime
+import com.simplexray.an.ui.EnableButton
 import com.simplexray.an.viewmodel.MainViewModel
 import kotlinx.coroutines.delay
 
 @Composable
 fun DashboardScreen(
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    onSwitchVpnService: () -> Unit,
 ) {
     val coreStats by mainViewModel.coreStatsState.collectAsState()
+    val serviceEnabled by mainViewModel.isServiceEnabled.collectAsState()
+    val serviceStateReady by mainViewModel.controlMenuClickable.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(Unit) {
@@ -54,6 +59,32 @@ fun DashboardScreen(
             .padding(start = 16.dp, end = 16.dp),
         contentPadding = PaddingValues(bottom = 16.dp, top = 16.dp)
     ) {
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.extraLarge),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                )
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Text(
+                        text = "Status",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    EnableButton(
+                        serviceEnabled = serviceEnabled,
+                        stateUpdating = !serviceStateReady,
+                        onClick = onSwitchVpnService,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                    StatRow("Running", if (!serviceStateReady) "..." else if (serviceEnabled) "Yes" else "No")
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         item {
             Card(

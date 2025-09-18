@@ -100,6 +100,7 @@ fun BottomNavHost(
     paddingValues: PaddingValues,
     mainViewModel: MainViewModel,
     onDeleteConfigClick: (File, () -> Unit) -> Unit,
+    onSwitchVpnService: () -> Unit,
     logViewModel: LogViewModel,
     geoipFilePickerLauncher: ActivityResultLauncher<Array<String>>,
     geositeFilePickerLauncher: ActivityResultLauncher<Array<String>>,
@@ -119,7 +120,10 @@ fun BottomNavHost(
             popEnterTransition = { popEnterTransition() },
             popExitTransition = { popExitTransition() }
         ) {
-            DashboardScreen(mainViewModel = mainViewModel)
+            DashboardScreen(
+                mainViewModel = mainViewModel,
+                onSwitchVpnService = onSwitchVpnService
+            )
         }
 
         composable(
