@@ -34,7 +34,7 @@ android {
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.simplexray.an"
+        applicationId "com.simplexray.an.beta"
         versionCode versionProps.APP_VERSION_CODE.toInteger()
         versionName versionProps.APP_VERSION_NAME
         ndk {
